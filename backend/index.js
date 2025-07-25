@@ -1,11 +1,12 @@
 //import required modules
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/mongo.config.js';
 dotenv.config({ path: './.env' });
 import short_url_route from './routes/short_url.route.js';
-
 const app = express();
+app.use(cors());
 //middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

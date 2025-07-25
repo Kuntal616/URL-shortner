@@ -1,9 +1,11 @@
-import { generateShortId } from "../utils/helper.js";
+import { generateShortId, isValidUrl } from "../utils/helper.js";
 import ShortUrl from "../models/short_url.model.js";
 
 export const handleGenerateNewShortUrl = async (req, res) => {
     const body = req.body;
+    console.log('Received URL:', body.url);
     if (!body.url) return res.status(400).json({ error: "URL is required" });
+    if(!isValidUrl(body.url)) return res.status(400).json({ error: "Invalid URL format" });
     const shortID = generateShortId();
     const short_url = new ShortUrl({
         shortId: shortID,
@@ -11,6 +13,7 @@ export const handleGenerateNewShortUrl = async (req, res) => {
         visitHistory: []
     });
     await short_url.save();
+    console.log('Heloo')
     return res.status(201).json({ shortId: shortID, shortURL: process.env.DEFAULT_URL + shortID, originalUrl: body.url });
 }
 
