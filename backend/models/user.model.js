@@ -1,5 +1,5 @@
 import mongoose from'mongoose';
-
+// in mongodb one ducument has limited size of 16MB
 const userSchema = new mongoose.Schema({
     name:{
         type: String,
@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     }
+
 },{timestamps: true});
 
 const User = mongoose.model('User', userSchema);

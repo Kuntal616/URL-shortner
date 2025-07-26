@@ -10,7 +10,14 @@ const shortUrlSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
-    visitHistory:[{timestamp:{type:String}}],
+    totalClicks: {
+        type: Number,
+        default: 0
+    },
+    lastVisited: {
+        type: Date,
+        default: null
+    },
     createdBy:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

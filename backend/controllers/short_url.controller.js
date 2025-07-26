@@ -9,13 +9,14 @@ export const handleGenerateNewShortUrl = async (req, res) => {
     const shortID = generateShortId();
     const short_url = new ShortUrl({
         shortId: shortID,
-        originalUrl: body.url,
-        visitHistory: []
+        originalUrl: body.url
+    
     });
     await short_url.save();
   
     return res.status(201).json({ shortId: shortID, shortURL: process.env.DEFAULT_URL + shortID, originalUrl: body.url });
 }
+
 
 export const handleGetAnalytics = async (req, res) => {
     const shortId = req.params.shortId;
@@ -25,9 +26,10 @@ export const handleGetAnalytics = async (req, res) => {
         return res.status(404).json({ error: "Short URL not found" });
     }
     return res.status(200).json({
-        totalClicks: result.visitHistory.length,
-        // originalUrl: result.originalUrl,
-        visitHistory: result.visitHistory
+        totalClicks: result.totalClicks,
+        lastVisited: result.lastVisited,
+        createdAt: result.createdAt,
+        originalUrl: result.originalUrl
     });
 }
 
@@ -37,8 +39,9 @@ export const handleRedirectToOriginalUrl = async (req, res) => {
         const entry = await ShortUrl.findOneAndUpdate({
             shortId: shortId
         },
-            {
-                $push: { visitHistory: { timestamp: new Date().toISOString() } }
+            { 
+                $inc: { totalClicks: 1 },
+                $set: { lastVisited: new Date() }
             },
             { new: true }
         );
