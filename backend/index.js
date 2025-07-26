@@ -5,6 +5,7 @@ import cors from 'cors';
 import connectDB from './config/mongo.config.js';
 dotenv.config({ path: './.env' });
 import short_url_route from './routes/short_url.route.js';
+import { handleRedirectToOriginalUrl } from './controllers/short_url.controller.js';
 const app = express();
 app.use(cors());
 //middleware to parse JSON and URL-encoded data
@@ -16,6 +17,8 @@ connectDB().then(()=> console.log('Database connected')).catch(err => console.lo
 
 //define the routes
 app.use("/api/shorturl", short_url_route);
+//redirect route
+app.router.get('/:shortId', handleRedirectToOriginalUrl);
 
 //start the server
 app.listen(process.env.PORT, () => {

@@ -13,7 +13,7 @@ export const handleGenerateNewShortUrl = async (req, res) => {
         visitHistory: []
     });
     await short_url.save();
-    console.log('Heloo')
+  
     return res.status(201).json({ shortId: shortID, shortURL: process.env.DEFAULT_URL + shortID, originalUrl: body.url });
 }
 
