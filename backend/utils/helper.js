@@ -1,23 +1,9 @@
+import jwt from 'jsonwebtoken';
 import {nanoid} from 'nanoid';
+
 
 export const generateShortId = () => nanoid(8);
 
-// export const isValidUrl = (url) => {
-//     try {
-//         // Check if URL has protocol, if not add https://
-//         const urlToTest = url.startsWith('http://') || url.startsWith('https://') 
-//             ? url 
-//             : 'https://' + url;
-        
-//         const urlObject = new URL(urlToTest);
-        
-//         // Additional validation: ensure it has a valid domain
-//         const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,})+$/;
-//         return domainRegex.test(urlObject.hostname);
-//     } catch (error) {
-//         return false;
-//     }
-// };
 export const isValidUrl = (url) => {
     try {
         // Add protocol if missing
@@ -64,3 +50,11 @@ export const isValidUrl = (url) => {
         return false;
     }
 };
+
+export const signToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, process.env.JWT_EXPIRATION ? { expiresIn: process.env.JWT_EXPIRATION } : {});
+}
+
+export const verifyToken = (token) => {
+    return jwt.verify(token, process.env.JWT_SECRET); 
+}

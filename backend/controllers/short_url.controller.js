@@ -62,3 +62,7 @@ export const handleRedirectToOriginalUrl = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 }
+
+// export const handleCustomShortUrl = async(req,res)=>{
+
+// }
