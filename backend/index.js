@@ -7,6 +7,7 @@ dotenv.config({ path: './.env' });
 import short_url_route from './routes/short_url.route.js';
 import user_route from './routes/user.route.js';
 import cookieParser from 'cookie-parser';
+import { attachUser } from './utils/attachUser.js';
 //import controller for redirecting to original URL
 import { handleRedirectToOriginalUrl } from './controllers/short_url.controller.js';
 const app = express();
@@ -16,9 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 //connect to the database
 connectDB().then(()=> console.log('Database connected')).catch(err => console.log('Database connection failed') + err);
 
+app.use(attachUser);
 //define the routes
 app.use("/api/shorturl", short_url_route);
 app.use('/api/user', user_route);

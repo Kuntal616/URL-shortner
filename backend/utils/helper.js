@@ -52,7 +52,9 @@ export const isValidUrl = (url) => {
 };
 
 export const signToken = (payload) => {
-    return jwt.sign(payload, process.env.JWT_SECRET, process.env.JWT_EXPIRATION ? { expiresIn: process.env.JWT_EXPIRATION } : {});
+     return jwt.sign(payload, process.env.JWT_SECRET, { 
+        expiresIn: process.env.JWT_EXPIRATION || '2h' 
+    })
 }
 
 export const verifyToken = (token) => {

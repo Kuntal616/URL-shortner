@@ -9,7 +9,7 @@ export const handleRegister = async (req, res) => {
             message: "User registration failed"
         });
     }
-    return res.status(201).cookie("accessToken", token, cookieOptions).json({
+    return res.status(201).cookie("token", token, cookieOptions).json({
         success: true,
         message: "User registered successfully"
     });
@@ -24,9 +24,29 @@ export const handleLogin = async (req, res) => {
             message: "Invalid email or password"
         });
     }
-    return res.cookie("accessToken", token, cookieOptions).status(200).json({
+    
+    return res.cookie("token", token, cookieOptions).status(200).json({
         success: true,
         message: "User logged in successfully",
         user
     });
+}
+
+export const handleLogout = async (req, res) => {
+    try {
+        // Clear both cookies (in case there's a typo in old cookie)
+        res.clearCookie('token');
+        res.clearCookie('accessToken'); // Clear old name
+        res.clearCookie('accesToken'); // Clear typo name
+        
+        return res.status(200).json({
+            success: true,
+            message: "User logged out successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error logging out"
+        });
+    }
 }
