@@ -16,6 +16,7 @@ export const handleRegister = async (req, res) => {
 }
 
 export const handleLogin = async (req, res) => {
+
     const { email, password } = req.body;
     const {token, user} = await loginUser(email, password);
     if (!token) {
@@ -28,7 +29,11 @@ export const handleLogin = async (req, res) => {
     return res.cookie("token", token, cookieOptions).status(200).json({
         success: true,
         message: "User logged in successfully",
-        user
+        user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+        }
     });
 }
 
