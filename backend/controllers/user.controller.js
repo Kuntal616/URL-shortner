@@ -18,7 +18,9 @@ export const handleRegister = async (req, res) => {
 export const handleLogin = async (req, res) => {
 
     const { email, password } = req.body;
+    
     const {token, user} = await loginUser(email, password);
+    
     if (!token) {
         return res.status(401).json({
             success: false,
@@ -30,7 +32,7 @@ export const handleLogin = async (req, res) => {
         success: true,
         message: "User logged in successfully",
         user: {
-                    id: user._id,
+                    _id: user._id,
                     name: user.name,
                     email: user.email,
         }
@@ -40,10 +42,7 @@ export const handleLogin = async (req, res) => {
 export const handleLogout = async (req, res) => {
     try {
         // Clear both cookies (in case there's a typo in old cookie)
-        res.clearCookie('token');
-        res.clearCookie('accessToken'); // Clear old name
-        res.clearCookie('accesToken'); // Clear typo name
-        
+        res.clearCookie('token'); 
         return res.status(200).json({
             success: true,
             message: "User logged out successfully"

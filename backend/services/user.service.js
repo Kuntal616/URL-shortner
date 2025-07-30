@@ -20,6 +20,7 @@ export const registerUser = async({name,email,password}) => {
 export const loginUser = async (email, password) => {
     try {
     const user = await findUserByEmail(email);
+
     if (!user || user.password !== password) {
         throw new Error('Invalid Credentials'); // Invalid email or password
     }

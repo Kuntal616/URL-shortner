@@ -2,6 +2,11 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
     baseURL: "http://localhost:3000/",
+    withCredentials: true, // This is crucial for sending/receiving cookies
+    timeout: 10000, // 10 seconds timeout
+    headers: {
+        'Content-Type': 'application/json',
+    }
 });
 
 // Request interceptor

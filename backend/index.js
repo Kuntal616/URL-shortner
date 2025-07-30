@@ -11,7 +11,14 @@ import { attachUser } from './utils/attachUser.js';
 //import controller for redirecting to original URL
 import { handleRedirectToOriginalUrl } from './controllers/short_url.controller.js';
 const app = express();
-app.use(cors());
+
+// CORS configuration to allow credentials
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend URL
+    credentials: true, // Allow credentials (cookies)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 //middleware to parse JSON and URL-encoded data
 app.use(express.json());
