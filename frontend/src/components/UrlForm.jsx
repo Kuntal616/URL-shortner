@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { createShortUrl } from "../api/shortUrl.api";
+import { useSelector } from "react-redux";
 const UrlForm = () => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [shortUrl, setShortUrl] = useState();
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [customShortId, setCustomShortId] = useState("")
+  const {isAuthenticated} = useSelector((state) => state.auth)
 
   const handleSubmit = async () => {
     setSubmitted(true);
@@ -13,13 +16,24 @@ const UrlForm = () => {
       setError("Please enter a URL");
       return;
     }
+    
+    console.log("Form submission:", { url, customShortId, isAuthenticated });
+    
     // Clear any previous error
     setError(""); 
     // Clear previous short URL
     setShortUrl(""); 
-    const result = await createShortUrl(url);
+    
+    // Pass both url and customShortId to the API
+    const result = await createShortUrl(url, customShortId);
+    
+    console.log("API result:", result);
+    
     if (result.success) {
       setShortUrl(result.data.shortURL);
+      // Clear form after success
+      setUrl("");
+      setCustomShortId("");
     } else {
       setError(result.error);
     }
@@ -43,6 +57,27 @@ const UrlForm = () => {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
         />
       </div>
+      
+      {/* Custom URL input - move before submit button */}
+      {isAuthenticated && (
+        <div>
+          <label htmlFor="customShortId" className="block text-sm font-medium text-gray-700 mb-2">
+            Custom URL (optional)
+          </label>
+          <input
+            type="text"
+            id="customShortId"
+            value={customShortId}
+            onChange={(event) => setCustomShortId(event.target.value)}
+            placeholder="Enter custom slug"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Will create: localhost:3000/{customShortId || 'your-custom-url'}
+          </p>
+        </div>
+      )}
+      
       {submitted && error && (
         <p className="text-red-500 text-sm mt-2">{error}</p>
       )}

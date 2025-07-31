@@ -14,34 +14,6 @@ const Home = () => {
           </p>
         </div>
         <UrlForm />
-{/* 
-        {shortUrl && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h3 className="text-sm font-medium text-green-800 mb-2">
-              Your shortened URL:
-            </h3>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={shortUrl}
-                readOnly
-                className="flex-1 px-3 py-2 bg-white border border-green-300 rounded text-sm focus:outline-none"
-              />
-              <button
-                onClick={copyToClipboard}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition duration-200"
-              >
-                Copy
-              </button>
-            </div> 
-            <button
-              onClick={handleReset}
-              className="mt-3 text-sm text-green-600 hover:text-green-700 underline"
-            >
-              Shorten another URL
-            </button>
-          </div>
-        )}*/}
         
       </div>
     </div>

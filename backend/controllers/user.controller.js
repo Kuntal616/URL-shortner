@@ -1,4 +1,5 @@
 import { cookieOptions } from '../config/config.js';
+import { getAllShortUrls } from '../dao/short_url.dao.js';
 import { registerUser, loginUser } from '../services/user.service.js';
 export const handleRegister = async (req, res) => {
     const {name,email,password} = req.body;
@@ -53,4 +54,32 @@ export const handleLogout = async (req, res) => {
             message: "Error logging out"
         });
     }
+}
+
+export const getCurrentUser =  (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        });
+    }
+    
+    return res.status(200).json({
+        success: true,
+        user: {
+            _id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+        }
+    });
+}
+
+export const getAllUrls = async (req,res)=>{
+    const userId = req.user._id;
+    const urls = await getAllShortUrls(userId);
+    return res.status(200).json({
+        success: true,
+        urls
+    });
+    
 }

@@ -1,9 +1,16 @@
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from '../utils/axiosInstance';
 
-// Create short URL
-export const createShortUrl = async (url) => {
+export const createShortUrl = async (url, customShortId) => {
   try {
-    const response = await axiosInstance.post("/api/shorturl", { url });
+    const payload = { url };
+
+    // Add custom short ID if provided
+    if (customShortId && customShortId.trim() !== '') {
+      payload.customShortId = customShortId.trim();
+    }
+    console.log("Payload for creating short URL:", payload);
+
+    const response = await axiosInstance.post('api/shorturl', payload);
     return { success: true, data: response.data };
   } catch (error) {
     return {

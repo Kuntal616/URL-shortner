@@ -39,3 +39,6 @@ export const getCustomShortUrl = async (customShortId)=>{
 export const getShortUrlAnalytics = async (shortId) => {
     return await ShortUrl.findOne({ shortId: shortId });
 }
+export const getAllShortUrls = async (userId) => {
+    return await ShortUrl.find({ createdBy: userId }).sort({ createdAt: -1 });
+}

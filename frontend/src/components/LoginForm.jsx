@@ -33,7 +33,6 @@ export default function LoginForm({state}) {
     setError("");
 
     try {
-      console.log("Form submitted with data:", formData);
       const data =  await loginUser(formData.email, formData.password);
       dispatch(login(data.user));
       navigate({ to: "/dashboard" });

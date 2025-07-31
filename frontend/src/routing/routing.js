@@ -3,6 +3,7 @@ import { rootRoute } from "./routeTree";
 import AuthContainer from "../pages/AuthContainer";
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
+import { checkAuth } from "../utils/helper";
 
 export const authRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -20,4 +21,5 @@ export const dashboardRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/dashboard",
     component:  Dashboard,
+    beforeLoad: checkAuth
 })
