@@ -1,190 +1,169 @@
-import { useState } from "react";
-import { createShortUrl } from "../api/shortUrl.api";
-import { useSelector } from "react-redux";
+import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { getUserUrls } from '../api/user.api.js'
 
-const UrlForm = () => {
-  const [url, setUrl] = useState("");
-  const [error, setError] = useState("");
-  const [shortUrl, setShortUrl] = useState();
-  const [copied, setCopied] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [customShortId, setCustomShortId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+const UserUrl = () => {
+  const { data: urls, isLoading, isError, error } = useQuery({
+    queryKey: ['userUrls'],
+    queryFn: getUserUrls,
+    refetchInterval: 30000, // Refetch every 30 seconds to update click counts
+    staleTime: 0, // Consider data stale immediately so it refetches when invalidated
+  })
+  const [copiedId, setCopiedId] = useState(null)
 
-  const validateCustomShortId = (shortId) => {
-    if (!shortId) return true; // Optional field
-
-    // Check if shortId contains only alphanumeric characters, hyphens, and underscores
-    const shortIdPattern = /^[a-zA-Z0-9_-]+$/;
-    if (!shortIdPattern.test(shortId)) {
-      return "Custom URL can only contain letters, numbers, hyphens, and underscores";
+  const formatLastVisited = (lastVisited) => {
+    if (!lastVisited) {
+      return (
+        <span className="text-gray-400 text-xs">Never visited</span>
+      )
     }
     
-    // Check length
-    if (shortId.length < 3) {
-      return "Custom URL must be at least 3 characters long";
-    }
-
-    if (shortId.length > 20) {
-      return "Custom URL must be less than 20 characters long";
-    }
+    const date = new Date(lastVisited)
+    const now = new Date()
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60))
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    const diffInDays = Math.floor(diffInHours / 24)
     
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    setSubmitted(true);
-    setLoading(true);
-    setError("");
-    setShortUrl("");
-
-   
-    // Validate URL
-    if (!url) {
-      setError("Please enter a URL");
-      setLoading(false);
-      return;
+    if (diffInMinutes < 1) {
+      return <span className="text-green-600 text-xs font-medium">Just now</span>
+    } else if (diffInMinutes < 60) {
+      return <span className="text-green-600 text-xs">{diffInMinutes}m ago</span>
+    } else if (diffInHours < 24) {
+      return <span className="text-blue-600 text-xs">{diffInHours}h ago</span>
+    } else if (diffInDays < 7) {
+      return <span className="text-gray-600 text-xs">{diffInDays}d ago</span>
+    } else {
+      return <span className="text-gray-600 text-xs">{date.toLocaleDateString()}</span>
     }
-    console.log("=== FORM SUBMISSION START ===");
-  console.log("URL:", url);
-  console.log("Custom Short ID:", customShortId);
-  console.log("Is Authenticated:", isAuthenticated);
-    // Validate custom short ID if provided
-    if (customShortId) {
-      const shortIdValidation = validateCustomShortId(customShortId);
-      if (shortIdValidation !== true) {
-        setError(shortIdValidation);
-        setLoading(false);
-        return;
-      }
-    }
+  }
 
-    try {
-      // Pass both URL and custom slug to API
-      const result = await createShortUrl(url, customShortId || undefined);
-      
-      if (result.success) {
-        setShortUrl(result.data.shortURL);
-        // Clear form after successful creation
-        setUrl("");
-        setCustomShortId("");
-      } else {
-        setError(result.error);
-      }
-    } catch (error) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleCopy = (url, id) => {
+    navigator.clipboard.writeText(url)
+    setCopiedId(id)
+    
+    // Reset the copied state after 2 seconds
+    setTimeout(() => {
+      setCopiedId(null)
+    }, 2000)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center my-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4">
+        Error loading your URLs: {error.message}
+      </div>
+    )
+  }
+
+  if (!urls.urls || urls.urls.length === 0) {
+    return (
+      <div className="text-center text-gray-500 my-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <svg className="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        <p className="text-lg font-medium">No URLs found</p>
+        <p className="mt-1">You haven't created any shortened URLs yet.</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label
-          htmlFor="url"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Enter your URL
-        </label>
-        <input
-          type="text"
-          id="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://example.com/very-long-url"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
-        />
+    <div className="bg-white rounded-lg mt-5 shadow-md overflow-hidden">
+      
+      <div className="overflow-x-auto  h-56">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Original URL
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Short URL
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Clicks
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Last Visited
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {urls.urls.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((url) => (
+              <tr key={url._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900 truncate max-w-xs">
+                    {url.originalUrl}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm">
+                    <a 
+                      href={`http://localhost:3000/${url.shortId}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-900 hover:underline"
+                    >
+                      {`localhost:3000/${url.shortId}`}
+                    </a>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {url.totalClicks} {url.totalClicks === 1 ? 'click' : 'clicks'}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm">
+                    {formatLastVisited(url.lastVisited)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-sm font-medium">
+                  <button
+                    onClick={() => handleCopy(`http://localhost:3000/${url.shortId}`, url._id)}
+                    className={`inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm ${
+                      copiedId === url._id
+                        ? 'bg-green-600 text-white hover:bg-green-700'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`}
+                  >
+                    {copiedId === url._id ? (
+                      <>
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                        Copy URL
+                      </>
+                    )}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      {/* Move custom slug input before submit button and show only when authenticated */}
-      {isAuthenticated && (
-        <div>
-          <label htmlFor="customShortId" className="block text-sm font-medium text-gray-700 mb-2">
-            Custom URL (optional)
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              id="customShortId"
-              value={customShortId}
-              onChange={(e) => setCustomShortId(e.target.value.toLowerCase())}
-              placeholder="my-custom-url"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <span className="text-gray-400 text-sm">
-                localhost:3000/
-              </span>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Use letters, numbers, hyphens, and underscores only (3-20 characters)
-          </p>
-        </div>
-      )}
-
-      {submitted && error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm">{error}</p>
-        </div>
-      )}
-
-      {submitted && shortUrl && (
-        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-600 text-sm">
-            URL shortened successfully!
-          </p>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
-      >
-        {loading ? (
-          <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Shortening...
-          </>
-        ) : (
-          "Shorten URL"
-        )}
-      </button>
-
-      {shortUrl && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="text-sm font-medium text-green-800 mb-2">
-            Your shortened URL:
-          </h3>
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={shortUrl}
-              readOnly
-              className="flex-1 px-3 py-2 bg-white border border-green-300 rounded text-sm focus:outline-none"
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(shortUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1500);
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition duration-200"
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
-  );
-};
+  )
+}
 
-export default UrlForm;
+export default UserUrl

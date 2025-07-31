@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createShortUrl } from "../api/shortUrl.api";
 import { useSelector } from "react-redux";
+
 const UrlForm = () => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
@@ -17,7 +18,6 @@ const UrlForm = () => {
       return;
     }
     
-    console.log("Form submission:", { url, customShortId, isAuthenticated });
     
     // Clear any previous error
     setError(""); 
@@ -27,10 +27,10 @@ const UrlForm = () => {
     // Pass both url and customShortId to the API
     const result = await createShortUrl(url, customShortId);
     
-    console.log("API result:", result);
     
     if (result.success) {
       setShortUrl(result.data.shortURL);
+      queryClient.invalidateQueries({ queryKey: ['userUrls'] });
       // Clear form after success
       setUrl("");
       setCustomShortId("");
