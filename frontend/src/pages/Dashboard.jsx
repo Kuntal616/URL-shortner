@@ -14,10 +14,10 @@ function Dashboard() {
             Transform your long URLs into short, shareable links
           </p>
         </div>
-        <UrlForm /> 
+        <UrlForm compact={false} />
       </div>
     </div>
-        <UserUrl />
+        {/* <UserUrl /> */}
         </>
   )
 }

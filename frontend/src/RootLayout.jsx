@@ -1,13 +1,16 @@
 
-import { Outlet } from "@tanstack/react-router";
-import Home from "./pages/Home";
+import { Outlet, useLocation } from "@tanstack/react-router";
 import Navbar from "./components/Navbar";
 
 const RootLayout = () => {
+  const location = useLocation();
+  const navRoutes = ["/"];
+  const isNavVisible = navRoutes.includes(location.pathname);
   return (
    <>
-   <Navbar/>
-   <Outlet />   
+   {isNavVisible && <Navbar />}
+   <Outlet />
+
    </>
   );
 };

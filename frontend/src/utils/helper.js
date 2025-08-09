@@ -10,10 +10,12 @@ export const checkAuth = async({context}) => {
             queryKey: ['currentUser'],
             queryFn: getCurrentUser
         });
-        if(!user) return false; // No user data means not authenticated
+        if(!user){ 
+             return redirect({ to: '/auth' });
+        } // No user data means not authenticated
         store.dispatch(login(user));
         const {isAuthenticated} = store.getState().auth;
-        if(!isAuthenticated) return false; // User is not authenticated
+        if(!isAuthenticated) return redirect({ to: '/auth' });
         return true; // User is authenticated
     } catch (error) {
         return redirect({ to: '/auth' });

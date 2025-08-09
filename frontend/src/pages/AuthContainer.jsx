@@ -1,11 +1,12 @@
-"use client";
 
 import { useState } from "react";
 import LoginForm from '../components/LoginForm.jsx';
 import RegisterForm from '../components/RegisterForm.jsx';
+import { useSearch } from "@tanstack/react-router";
 
 export default function AuthContainer() {
-  const [login, setLogin] = useState(true);
+  const {mode} = useSearch({from: "/auth"});
+  const [login, setLogin] = useState(mode !== "register");
 
   
 

@@ -1,11 +1,11 @@
-"use client";
+
 
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { registerUser } from "../api/user.api";
 import { useDispatch } from "react-redux";
 import { login } from "../store/slice/authSlice.js";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 export default function RegisterForm({ state }) {
   const [formData, setFormData] = useState({
@@ -175,12 +175,15 @@ export default function RegisterForm({ state }) {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <button
-              onClick={() => state(true)}
+            <Link
+              onClick={() => {
+                navigate({ to: "/auth?mode=login" })
+                state(true)
+              }}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>

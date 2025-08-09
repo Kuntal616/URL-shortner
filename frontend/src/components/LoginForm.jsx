@@ -1,13 +1,12 @@
-"use client";
-
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { loginUser } from "../api/user.api";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../store/slice/authSlice.js";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "./ui/button";
 
-export default function LoginForm({state}) {
+export default function LoginForm({ state }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,17 +27,17 @@ export default function LoginForm({state}) {
   };
 
   const handleSubmit = async () => {
-    
     setLoading(true);
     setError("");
 
     try {
-      const data =  await loginUser(formData.email, formData.password);
+      const data = await loginUser(formData.email, formData.password);
       dispatch(login(data.user));
       navigate({ to: "/dashboard" });
-     
     } catch (err) {
-      setError(err?.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err?.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -49,10 +48,12 @@ export default function LoginForm({state}) {
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your URL shortener account</p>
+          <p className="text-gray-600 mt-2">
+            Sign in to your URL shortener account
+          </p>
         </div>
 
-        <div  className="space-y-6">
+        <div className="space-y-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
               {error}
@@ -60,7 +61,10 @@ export default function LoginForm({state}) {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email Address
             </label>
             <div className="relative">
@@ -79,7 +83,10 @@ export default function LoginForm({state}) {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Password
             </label>
             <div className="relative">
@@ -99,7 +106,11 @@ export default function LoginForm({state}) {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
               </button>
             </div>
           </div>
@@ -117,9 +128,15 @@ export default function LoginForm({state}) {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             {"Don't have an account? "}
-            <button onClick={() => state(false)} className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link
+              className="text-blue-600 hover:text-blue-700 font-medium"
+              onClick={() =>{ 
+                navigate({ to: "/auth?mode=register" })
+                state(false)
+              }}
+            >
               Sign up
-            </button>
+            </Link>
           </p>
         </div>
       </div>

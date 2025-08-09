@@ -4,22 +4,26 @@ import AuthContainer from "../pages/AuthContainer";
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import { checkAuth } from "../utils/helper";
+import HomePage from "@/pages/HomePage";
 
 export const authRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/auth",
+    validateSearch: (search) => ({
+    mode: search.mode , // default to login
+  }),
     component:  AuthContainer,
 })
 
 export const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
-    component:  Home,
+    component:  HomePage,
 })
 
 export const dashboardRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/dashboard",
-    component:  Dashboard,
-    beforeLoad: checkAuth
+    beforeLoad: checkAuth,
+    component:  Dashboard
 })
