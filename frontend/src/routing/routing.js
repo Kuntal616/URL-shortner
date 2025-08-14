@@ -1,7 +1,6 @@
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./routeTree";
 import AuthContainer from "../pages/AuthContainer";
-import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import { checkAuth } from "../utils/helper";
 import HomePage from "@/pages/HomePage";

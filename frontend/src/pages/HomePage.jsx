@@ -82,6 +82,22 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <footer className="border-t">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 text-sm">
+          <p className="text-muted-foreground">
+            {"© "}
+            {new Date().getFullYear()} SnapURL
+          </p>
+          <div className="flex gap-4">
+            <a href="#" className="hover:underline underline-offset-4">
+              Terms
+            </a>
+            <a href="#" className="hover:underline underline-offset-4">
+              Privacy
+            </a>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
