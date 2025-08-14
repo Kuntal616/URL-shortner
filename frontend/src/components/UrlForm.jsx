@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { createShortUrl } from "../api/shortUrl.api";
 import { useSelector } from "react-redux";
-import { Copy, LinkIcon, Loader2 } from "lucide-react";
+import { Copy, LinkIcon, Loader2, Plus } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
+import { useQueryClient } from "@tanstack/react-query";
 
-const UrlForm = ({ compact }) => {
+const UrlForm = ({ compact,onUrlCreated }) => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [shortUrl, setShortUrl] = useState();
@@ -16,6 +17,7 @@ const UrlForm = ({ compact }) => {
   const [customShortId, setCustomShortId] = useState("");
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
     setSubmitted(true);
@@ -31,23 +33,39 @@ const UrlForm = ({ compact }) => {
     // Clear previous short URL
     setShortUrl("");
 
-    // Pass both url and customShortId to the API
-    const result = await createShortUrl(url, customShortId);
-
-    if (result.success) {
-      setShortUrl(result.data.shortURL);
-      setLoading(false);
-      queryClient.invalidateQueries({ queryKey: ["userUrls"] });
-      // Clear form after success
-      setUrl("");
-      setCustomShortId("");
-    } else {
-      setError(result.error);
+    try {
+      // Pass both url and customShortId to the API
+      const result = await createShortUrl(url, customShortId);
+      console.log("API Response:", result);
+      if (result.success) {
+        setShortUrl(result.data.shortURL);
+        if (onUrlCreated) {
+          onUrlCreated(result.data);
+        }
+        queryClient.invalidateQueries({ queryKey: ["userUrls"] });
+        // Clear form after success
+        setUrl("");
+        setCustomShortId("");
+        setLoading(false);
+      } else {
+        setError(result.error);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error creating short URL:", error);
+      setError(error?.message || "Failed to create short URL. Please try again.");
       setLoading(false);
     }
   };
+  const handleNew = () => {
+    setUrl("");
+    setCustomShortId("");
+    setShortUrl("");
+    setError("");
+    setSubmitted(false);
+    setCopied(false);
+  };
   if (compact) {
-    console.log("Compact mode");
     return (
       <>
         <div className="flex w-full flex-col gap-3 sm:flex-row">
@@ -105,89 +123,7 @@ const UrlForm = ({ compact }) => {
     );
   }
 
-  // return (
-  //   <div className="space-y-4">
-  //     <div>
-  //       <label
-  //         htmlFor="url"
-  //         className="block text-sm font-medium text-gray-700 mb-2"
-  //       >
-  //         Enter your URL
-  //       </label>
-  //       <input
-  //         type="text"
-  //         id="url"
-  //         value={url}
-  //         onChange={(e) => setUrl(e.target.value)}
-  //         placeholder="https://example.com/very-long-url"
-  //         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
-  //       />
-  //     </div>
-
-  //     {/* Custom URL input - move before submit button */}
-  //     {isAuthenticated && (
-  //       <div>
-  //         <label htmlFor="customShortId" className="block text-sm font-medium text-gray-700 mb-2">
-  //           Custom URL (optional)
-  //         </label>
-  //         <input
-  //           type="text"
-  //           id="customShortId"
-  //           value={customShortId}
-  //           onChange={(event) => setCustomShortId(event.target.value)}
-  //           placeholder="Enter custom slug"
-  //           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
-  //         />
-  //         <p className="text-xs text-gray-500 mt-1">
-  //           Will create: localhost:3000/{customShortId || 'your-custom-url'}
-  //         </p>
-  //       </div>
-  //     )}
-
-  //     {submitted && error && (
-  //       <p className="text-red-500 text-sm mt-2">{error}</p>
-  //     )}
-  //     {submitted && shortUrl && (
-  //       <p className="text-green-500 text-sm mt-2">
-  //         URL shortened successfully!
-  //       </p>
-  //     )}
-  //     <button
-  //       type="submit"
-  //       onClick={handleSubmit}
-  //       className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center"
-  //     >
-  //       Shorten URL
-  //     </button>
-  //     {shortUrl && (
-  //       <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-  //         <h3 className="text-sm font-medium text-green-800 mb-2">
-  //           Your shortened URL:
-  //         </h3>
-  //         <div className="flex items-center space-x-2">
-  //           <input
-  //             type="text"
-  //             value={shortUrl}
-  //             readOnly
-  //             className="flex-1 px-3 py-2 bg-white border border-green-300 rounded text-sm focus:outline-none"
-  //           />
-  //           <button
-  //             onClick={() => {
-  //               navigator.clipboard.writeText(shortUrl);
-  //               setCopied(true);
-  //               setTimeout(() => setCopied(false), 1500);
-  //             }}
-  //             className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm transition duration-200"
-  //           >
-  //             {copied ? "Copied" : "Copy"}
-  //           </button>
-  //         </div>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
-
-  console.log("Compact mode off");
+ 
   return (
     <Card className="w-full">
       <CardHeader>
@@ -248,6 +184,15 @@ const UrlForm = ({ compact }) => {
         <Copy className="mr-2 h-4 w-4" />
         {copied ? "Copied" : "Copy"}
       </Button>
+       <Button
+              type="button"
+              variant="outline"
+              onClick={handleNew}
+              className="flex-shrink-0"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              New
+            </Button>
     </div>
   </div>
 )}

@@ -19,3 +19,17 @@ export const createShortUrl = async (url, customShortId) => {
     };
   }
 };
+
+export const getShortUrlAnalytics = async (shortId) => {
+  try {
+    const response = await axiosInstance.get(`api/shorturl/analytics/${shortId}`);
+    console.log("Short URL Analytics:", response.data);
+    return { success: true, data: response.data };
+  } catch (er) {
+    console.log(er)
+    return {
+      success: false,
+      error: er.response?.data?.error || 'Something went wrong. Please try again.'
+    };
+  }
+}

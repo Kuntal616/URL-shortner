@@ -1,6 +1,7 @@
 
 import { Outlet, useLocation } from "@tanstack/react-router";
 import Navbar from "./components/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 
 const RootLayout = () => {
   const location = useLocation();
@@ -9,6 +10,7 @@ const RootLayout = () => {
   return (
    <>
    {isNavVisible && <Navbar />}
+   <Toaster />
    <Outlet />
 
    </>

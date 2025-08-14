@@ -1,6 +1,7 @@
 import { cookieOptions } from '../config/config.js';
 import { getAllShortUrls } from '../dao/short_url.dao.js';
 import { registerUser, loginUser } from '../services/user.service.js';
+import { deleteShortUrl } from '../dao/short_url.dao.js';
 export const handleRegister = async (req, res) => {
     const {name,email,password} = req.body;
     const token = await registerUser({name,email,password});
@@ -82,4 +83,19 @@ export const getAllUrls = async (req,res)=>{
         urls
     });
     
+}
+
+export const handleDeleteUserUrl = async (req, res) => {
+    const { id } = req.params;
+    const deletedUrl = await deleteShortUrl(id);
+    if (!deletedUrl) {
+        return res.status(404).json({
+            success: false,
+            message: "Short URL not found"
+        });
+    }
+    return res.status(200).json({
+        success: true,
+        message: "Short URL deleted successfully"
+    });
 }

@@ -42,3 +42,10 @@ export const getShortUrlAnalytics = async (shortId) => {
 export const getAllShortUrls = async (userId) => {
     return await ShortUrl.find({ createdBy: userId }).sort({ createdAt: -1 });
 }
+export const deleteShortUrl = async (id) => {
+    const deletedUrl = await ShortUrl.findByIdAndDelete(id);
+    if (!deletedUrl) {
+        throw new Error('Short URL not found');
+    }
+    return deletedUrl;
+}

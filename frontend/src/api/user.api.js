@@ -41,9 +41,20 @@ export const getCurrentUser = async () => {
 export const getUserUrls = async () => {
     try {
         const response = await axiosInstance.get('/api/user/urls');
-        return response.data;
+        ;
+        return response.data.urls;
     } catch (error) {
         console.error('Failed to fetch user URLs:', error);
+        throw error;
+    }
+}
+
+export const deleteUserUrl = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/api/user/urls/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to delete user URL:', error);
         throw error;
     }
 }
