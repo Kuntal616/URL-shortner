@@ -62,19 +62,24 @@ export default function DashboardPage() {
   }, [urls]);
 
   // Callback to refresh URLs when new URL is created
-  const handleUrlCreated = (newUrl) => {
-    queryClient.setQueriesData(["userUrls"],(oldData)=>{
-      const updatedData = [newUrl, ...(oldData || [])];
-      return updatedData;
-    })
-    // Optional: Invalidate to refetch from server
-    // queryClient.invalidateQueries({ queryKey: ["userUrls"] });
-  };
+const handleUrlCreated = (newUrl) => {
+  queryClient.setQueryData(["userUrls"], (oldData) => {
+    // Fix: Ensure oldData is always an array
+    if (!Array.isArray(oldData)) {
+      return [newUrl];
+    }
+    return [newUrl, ...oldData];
+  });
+  
+  // Optional: Invalidate to refetch from server
+  // queryClient.invalidateQueries({ queryKey: ["userUrls"] });
+};
 
  // Handle URLs update from LinkTable
-  const handleUrlsUpdate = (updatedUrls) => {
-    queryClient.setQueryData(["userUrls"], updatedUrls);
-  };  
+const handleUrlsUpdate = (updatedUrls) => {
+  const safeUpdatedUrls = Array.isArray(updatedUrls) ? updatedUrls : [];
+  queryClient.setQueryData(["userUrls"], safeUpdatedUrls);
+}; 
 
   if (loading) {
     return (

@@ -45,7 +45,7 @@ const LinkTable = ({ urls, onUrlsUpdate }) => {
 };
 
   const handleCopy = (url, id) => {
-    const fullShortUrl = `${window.location.origin}/${url}`;
+    const fullShortUrl = import.meta.env.VITE_API_URL + url;
     navigator.clipboard.writeText(fullShortUrl);
     setCopiedId(id);
 

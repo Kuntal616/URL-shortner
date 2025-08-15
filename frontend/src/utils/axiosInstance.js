@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000/",
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true, // This is crucial for sending/receiving cookies
     timeout: 10000, // 10 seconds timeout
     headers: {

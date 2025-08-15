@@ -39,9 +39,9 @@ export default function HomePage() {
               </div>
             </div>
             <div className="relative order-first md:order-last">
-              <div className="aspect-[4/3] w-full max-w-lg mx-auto md:max-w-none">
+              <div className="w-full max-w-[1200px] aspect-[1200/754] mx-auto md:max-w-none">
                 <img
-                  src="/placeholder.svg?height=600&width=800"
+                  src="/dashboradPreview.png"
                   alt="Dashboard preview"
                   className="w-full h-full object-cover rounded-xl border shadow-sm"
                 />
@@ -54,11 +54,15 @@ export default function HomePage() {
       <section id="features" className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
         <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { title: "Fast & reliable", desc: "Create short links instantly with high availability." },
-            { title: "Analytics", desc: "Track clicks, referrers, and top performing links." },
-            { title: "Privacy-first", desc: "We only store what you need—no invasive tracking." },
+            { title: "Fast & reliable", desc: "Create short links instantly with high availability.",
+              icon: "⚡" },
+            { title: "Analytics", desc: "Track clicks, referrers, and top performing links.",
+              icon: "📊" },
+            { title: "Privacy-first", desc: "We only store what you need—no invasive tracking.",
+              icon: "🔒" },
           ].map((f) => (
-            <div key={f.title} className="rounded-lg border p-4 sm:p-6">
+            <div key={f.title} className="rounded-lg text-center border p-4 sm:p-6">
+               <div className="text-4xl mb-4">{f.icon}</div>
               <h3 className="mb-2 text-lg sm:text-xl font-semibold">{f.title}</h3>
               <p className="text-sm sm:text-base text-muted-foreground">{f.desc}</p>
             </div>
