@@ -7,7 +7,7 @@ export const createShortUrlWithoutUser = async (originalUrl)=>{
          throw new Error('Short ID is required');
      }
      await saveShortUrl(shortId, originalUrl);
-     return { shortId, shortURL: process.env.DEFAULT_URL + shortId, originalUrl };
+     return { shortId, shortURL: `https://url-shortner-5mo4.onrender.com/${shortId}`, originalUrl };
 }
 
 export const createShortUrlWithUser = async(originalUrl, createdBy, customShortId=null)=>{
@@ -16,5 +16,5 @@ export const createShortUrlWithUser = async(originalUrl, createdBy, customShortI
         throw new Error('Short ID is required');
     }
     await saveShortUrl(shortId, originalUrl, createdBy);
-    return { shortId, shortURL: process.env.DEFAULT_URL + shortId, originalUrl };
+    return { shortId, shortURL: `https://url-shortner-5mo4.onrender.com/${shortId}`, originalUrl };
 }
