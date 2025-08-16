@@ -18,7 +18,7 @@ const __dirname = path.resolve();
 
 // CORS configuration to allow credentials
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'], // Include both localhost and 127.0.0.1
+    origin: ['https://url-shortner-5mo4.onrender.com','http://localhost:5173'], // Include both localhost and 127.0.0.1
     credentials: true, // Allow credentials (cookies)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],

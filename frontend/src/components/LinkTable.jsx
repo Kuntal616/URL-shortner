@@ -45,7 +45,8 @@ const LinkTable = ({ urls, onUrlsUpdate }) => {
 };
 
   const handleCopy = (url, id) => {
-    const fullShortUrl = `http://localhost:3000/${url}`;
+    // const fullShortUrl = `http://localhost:3000/${url}`;
+    const fullShortUrl = `https://url-shortner-5mo4.onrender.com/${url}`;
     navigator.clipboard.writeText(fullShortUrl);
     setCopiedId(id);
 
