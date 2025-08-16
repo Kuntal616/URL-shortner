@@ -1,6 +1,7 @@
 //import required modules
-import express from 'express';
 import dotenv from 'dotenv';
+import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import connectDB from './config/mongo.config.js';
 dotenv.config({ path: './.env' });
@@ -8,9 +9,12 @@ import short_url_route from './routes/short_url.route.js';
 import user_route from './routes/user.route.js';
 import cookieParser from 'cookie-parser';
 import { attachUser } from './utils/attachUser.js';
+import {validateShortId} from './middlewares/shortId.middleware.js'
 //import controller for redirecting to original URL
 import { handleRedirectToOriginalUrl } from './controllers/short_url.controller.js';
+
 const app = express();
+const __dirname = path.resolve();
 
 // CORS configuration to allow credentials
 app.use(cors({
@@ -34,8 +38,16 @@ app.use(attachUser);
 //define the routes
 app.use("/api/shorturl", short_url_route);
 app.use('/api/user', user_route);
+
+// Serve static files from the React frontend
+app.use(express.static(path.join(__dirname, './frontend/dist')));
 //redirect route
-app.get('/:shortId', handleRedirectToOriginalUrl);
+app.get('/:shortId', validateShortId , handleRedirectToOriginalUrl);
+
+// Catch-all for React frontend routes
+app.get(/.*/, (_, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
 
 //start the server
 app.listen(process.env.PORT, () => {
